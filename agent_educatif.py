@@ -13,7 +13,7 @@ import gradio as gr
 
 
 # Déclaration de la clef d'API
-os.environ["GOOGLE_API_KEY"] = "AIzaSyDra8dzulksCHQhjiaU6v-Mqp4yUR4dg6E"
+os.environ["GOOGLE_API_KEY"] = "MA_CLE_GOOGLE_ICI"
 
 # Création d'une instance de chat
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3, max_tokens=None)
