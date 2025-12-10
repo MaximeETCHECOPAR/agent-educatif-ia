@@ -1,0 +1,20 @@
+# --- Fichiers système et IDE ---
+.vscode/
+__pycache__/
+*.pyc
+
+# --- Environnement virtuel Python ---
+venv/
+env/
+
+# --- Fichiers générés par l'appli ---
+*.mp3
+output_audio.mp3
+correction.mp3
+*.wav
+
+# --- Cache Gradio---
+.gradio/
+
+# --- Sécurité ---
+.env
