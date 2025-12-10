@@ -1,6 +1,6 @@
 # =========================== #
 # AGENT EDUCATEUR INTELLIGENT #
-# Auteur : Maxime ETCHECOPAR  A ajouter : truc qui montre que ça charge quand on clique sur générer le qcm # 
+# Auteur : Maxime ETCHECOPAR  # 
 # =========================== #
 
 import os
@@ -8,6 +8,7 @@ import math
 import re
 import gradio as gr
 from datetime import datetime
+from dotenv import load_dotenv # Import pour charger le fichier .env
 
 # Importations LangChain
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -22,8 +23,12 @@ from gtts import gTTS
 # 1. Configuration & API Keys  #
 # ============================ #
 
-os.environ["GOOGLE_API_KEY"] = "MA_CLE_GOOGLE_ICI"
-os.environ["TAVILY_API_KEY"] = "MA_CLE_TAVILY_ICI"
+# Charge les clés depuis le fichier .env
+load_dotenv()
+
+# Vérification de sécurité 
+if not os.getenv("GOOGLE_API_KEY"):
+    print("ERREUR : Clé Google non trouvée. Vérifie le fichier .env")
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3, max_tokens=None)
 
@@ -157,9 +162,11 @@ def chat_cours(message, history):
     history.append((message, response))
     return "", history
 
-def generer_qcm(sujet, niveau, nombre_questions):
+def generer_qcm(sujet, niveau, nombre_questions, progress=gr.Progress()):
     if not sujet: return "Attention aucun sujet défini ! Veuillez entrer un sujet ci-dessus."
     
+    progress(0, desc="Création du quiz...")
+
     prompt = f"""
     Agis en MODE QCM.
     Sujet : {sujet}
@@ -179,9 +186,11 @@ def generer_qcm(sujet, niveau, nombre_questions):
     reponse = agent_chain.run(input=prompt)
     return reponse
 
-def corriger_et_archiver(reponses_utilisateur, sujet, niveau, historique_data):
+def corriger_et_archiver(reponses_utilisateur, sujet, niveau, historique_data, progress=gr.Progress()):
     if not reponses_utilisateur: return "Veuillez entrer vos réponses.", historique_data
     
+    progress(0, desc="Correction en cours...")
+
     prompt = f"""
     Agis en MODE CORRECTION.
     Voici mes réponses : {reponses_utilisateur}.
@@ -218,10 +227,9 @@ with gr.Blocks(title="Plateforme Éducative IA", theme=gr.themes.Soft()) as inte
     with gr.Tab("Discussion & Cours"):
         gr.Markdown("### Discutez avec le professeur pour apprendre")
         chatbot_cours = gr.Chatbot(height=400, label="Professeur")
-        msg_input = gr.Textbox(label="Votre message", placeholder="Bonjour, explique-moi la photosynthèse...")
+        msg_input = gr.Textbox(label="Votre message / Sujet", placeholder="Bonjour, explique-moi la photosynthèse...")
         btn_send = gr.Button("Envoyer", variant="primary")
         
-        # Le chat fonctionne en autonomie, sans impacter l'onglet 2
         btn_send.click(
             fn=chat_cours, 
             inputs=[msg_input, chatbot_cours], 
@@ -238,7 +246,6 @@ with gr.Blocks(title="Plateforme Éducative IA", theme=gr.themes.Soft()) as inte
         gr.Markdown("### Configurez votre Quiz")
         
         with gr.Row():
-            # Champ indépendant
             qcm_sujet_input = gr.Textbox(label="Sujet du Quiz", placeholder="Entrez le sujet ici (ex: Les Volcans)", interactive=True)
         
         with gr.Row():
@@ -260,13 +267,15 @@ with gr.Blocks(title="Plateforme Éducative IA", theme=gr.themes.Soft()) as inte
         btn_start_qcm.click(
             fn=generer_qcm,
             inputs=[qcm_sujet_input, qcm_niveau, qcm_nombre],
-            outputs=[qcm_display]
+            outputs=[qcm_display],
+            show_progress="minimal" 
         )
         
         btn_valider.click(
             fn=corriger_et_archiver,
             inputs=[input_reponses, qcm_sujet_input, qcm_niveau, history_state],
-            outputs=[correction_display, history_state]
+            outputs=[correction_display, history_state],
+            show_progress="minimal"
         )
 
     # --- ONGLET 3 : HISTORIQUE ---
@@ -284,4 +293,4 @@ with gr.Blocks(title="Plateforme Éducative IA", theme=gr.themes.Soft()) as inte
         btn_refresh.click(fn=refresh_table, inputs=[history_state], outputs=[history_table])
 
 if __name__ == "__main__":
-    interface.launch(share=True)
+    interface.queue().launch(share=True)
