@@ -166,9 +166,12 @@ agent_chain = initialize_agent(
 
 def extraire_score(texte):
     """
-    Sert à remplir le tableau d'historique
+    Sert à remplir le tableau d'historique.
     """
     match = re.search(r'(\d+(?:[\.,]\d+)?)\s*%', texte)
+    if match:
+        return f"{match.group(1)}%"
+    return "Non détecté"
 
 
 def nettoyer_sortie(texte):
