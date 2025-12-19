@@ -169,8 +169,19 @@ def extraire_score(texte):
     Sert à remplir le tableau d'historique.
     """
     match = re.search(r'(\d+(?:[\.,]\d+)?)\s*%', texte)
+    
     if match:
-        return f"{match.group(1)}%"
+        try:
+            valeur = float(match.group(1).replace(',', '.'))
+            valeur_arrondie = round(valeur, 2)
+            
+            if valeur_arrondie.is_integer():
+                return f"{int(valeur_arrondie)}%"
+            
+            return f"{valeur_arrondie}%"
+        except:
+            return f"{match.group(1)}%"
+            
     return "Non détecté"
 
 
@@ -249,6 +260,7 @@ def corriger_et_archiver(reponses_utilisateur, sujet, niveau, historique_data, p
     
     Ensuite explique pourquoi c'est juste ou faux.
     Calcule le score avec la calculatrice.
+    FAIS UN SAUT DE LIGNE JUSTE APRÈS LE SCORE.
     """
     reponse_ia = agent_chain.run(input=prompt)
     
