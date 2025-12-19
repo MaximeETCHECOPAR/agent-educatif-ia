@@ -49,13 +49,15 @@ memory = ConversationBufferMemory(
 wikipedia = WikipediaAPIWrapper(lang='fr') 
 wikipedia_tool = Tool(
     name="wikipedia",
-    func=wikipedia.run
+    func=wikipedia.run,
+    description="Permet de rechercher des définitions et des informations."
 )
 
 # Outil 2 : Tavily pour les recherches web.
 search_tool = Tool(
     name="Recherche Web",
-    func=TavilySearchResults(max_results=3).run
+    func=TavilySearchResults(max_results=3).run,
+    description="Permet de chercher des informations d'actualité sur internet."
 )
 
 # Fonction pour la calculatrice
@@ -74,12 +76,14 @@ def calculator(expression):
 # Outil 3 : La Calculatrice
 calculator_tool = Tool(
     name="Calculatrice",
-    func=calculator
+    func=calculator,
+    description="obligatoire pour effectuer tout les calculs mathématiques, pour le pourcentage du score."
 )
 
 # Outil 4 : Exécuteur Python
 python_tool = PythonREPLTool()
 python_tool.name = "Python Executor"
+python_tool.description = "Permet d'exécuter du code Python."
 
 # Fonction pour l'heure
 def get_current_time(query=""):
@@ -90,6 +94,7 @@ def get_current_time(query=""):
 time_tool = Tool(
     name="Heure Actuelle",
     func=get_current_time,
+    description="Donne l'heure actuelle."
 )
 
 # Fonction pour le TTS (Text-To-Speech)
