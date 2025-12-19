@@ -25,8 +25,8 @@ from gtts import gTTS
 # 1. Configuration  #
 # ================= #
 
-os.environ["GOOGLE_API_KEY"] = "AIzaSyDvv1nbERpa7CTUgXU-_mppDJ5dzqU5sJg" 
-os.environ["TAVILY_API_KEY"] = "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"
+os.environ["GOOGLE_API_KEY"] = "VOTRE_CLE_GOOGLE_ICI" 
+os.environ["TAVILY_API_KEY"] = "VOTRE_CLE_TAVILY_ICI"
 
 # Charge les variables d'environnement (clé api)
 load_dotenv()
